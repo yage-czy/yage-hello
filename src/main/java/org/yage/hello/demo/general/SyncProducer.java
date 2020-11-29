@@ -1,5 +1,6 @@
 package org.yage.hello.demo.general;
 
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
@@ -34,21 +35,23 @@ public class SyncProducer {
             InterruptedException,
             MQBrokerException {
 
-        DefaultMQProducer defaultMQProducer = new DefaultMQProducer(DEMO_PREFIX + "producer-group");
-        defaultMQProducer.setNamesrvAddr("localhost:9876");
-        defaultMQProducer.start();
+        DefaultMQProducer defaultMqProducer = new DefaultMQProducer(DEMO_PREFIX + "producer-group");
+        defaultMqProducer.setNamesrvAddr("localhost:9876");
+        defaultMqProducer.start();
 
         for (int i = 0; i < 10; i++) {
 
             String text = DEMO_PREFIX + "Hello RocketMQ - " + i;
             byte[] bytes = text.getBytes(RemotingHelper.DEFAULT_CHARSET);
             Message message = new Message(
-                    "producer-group-topic",
+                    DEMO_PREFIX + "topic",
                     "TagA",
                     bytes);
 
-            SendResult sendResult = defaultMQProducer.send(message);
-            log.info("sendResult{}", sendResult);
+            SendResult sendResult = defaultMqProducer.send(message);
+            log.info("sendResult -> {}", JSON.toJSONString(sendResult));
         }
+
+        defaultMqProducer.shutdown();
     }
 }
